@@ -1,5 +1,6 @@
 import { formatMoney } from '../../domain/invoice'
 import type { InvoiceDraft, InvoiceTotals } from '../../types'
+import { InvoiceLineRows } from './InvoiceLineRows'
 import styles from './InvoicePreview.module.scss'
 
 type InvoicePreviewProps = {
@@ -39,43 +40,40 @@ export const InvoicePreview = ({ draft, totals }: InvoicePreviewProps) => (
       <table>
         <thead>
           <tr>
-            <th scope="col">Description</th>
+            <th scope="col">Item</th>
+            <th scope="col">Description / Tax</th>
             <th scope="col">Rate</th>
             <th scope="col">Qty</th>
-            <th scope="col">Tax</th>
-            <th scope="col">Tax Amount</th>
-            <th scope="col">Total</th>
+            <th scope="col">Amount</th>
           </tr>
         </thead>
         <tbody>
-          {totals.lines.map((line) => (
-            <tr key={line.id}>
-              <td className={styles.description}>{line.description || '-'}</td>
-              <td>{formatMoney(Number(line.rate) || 0, draft.currency)}</td>
-              <td>{line.quantity || '0'}</td>
-              <td>{line.taxName}</td>
-              <td>{formatMoney(line.taxAmount, draft.currency)}</td>
-              <td>{formatMoney(line.total, draft.currency)}</td>
-            </tr>
+          {totals.lines.map((line, index) => (
+            <InvoiceLineRows
+              currency={draft.currency}
+              line={line}
+              lineNumber={index + 1}
+              key={line.id}
+            />
           ))}
         </tbody>
         <tfoot>
           <tr>
-            <th scope="row" colSpan={5}>Subtotal</th>
+            <th scope="row" colSpan={4}>Subtotal</th>
             <td>{formatMoney(totals.subtotal, draft.currency)}</td>
           </tr>
           {totals.taxTotals.map((taxTotal) => (
             <tr key={taxTotal.id}>
-              <th scope="row" colSpan={5}>{taxTotal.name} Total</th>
+              <th scope="row" colSpan={4}>{taxTotal.name} Total</th>
               <td>{formatMoney(taxTotal.amount, draft.currency)}</td>
             </tr>
           ))}
           <tr>
-            <th scope="row" colSpan={5}>Tax Total</th>
+            <th scope="row" colSpan={4}>Tax Total</th>
             <td>{formatMoney(totals.totalTax, draft.currency)}</td>
           </tr>
           <tr className={styles.totalRow}>
-            <th scope="row" colSpan={5}>Total</th>
+            <th scope="row" colSpan={4}>Total</th>
             <td>{formatMoney(totals.total, draft.currency)}</td>
           </tr>
         </tfoot>

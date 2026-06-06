@@ -12,39 +12,43 @@ const draft: InvoiceDraft = {
   taxTypes: [
     { id: 'no-tax', name: 'No Tax', rate: 0 },
     { id: 'gst', name: 'GST', rate: 0.1 },
-    { id: 'other-gst', name: 'Other GST', rate: 0.1 }
+    { id: 'levy', name: 'Service Levy', rate: 0.05 }
   ],
   lineItems: [
-    { id: 'line-1', description: 'Build app', rate: '100', quantity: '2', taxTypeId: 'gst' },
-    { id: 'line-2', description: 'Hosting', rate: '50', quantity: '1', taxTypeId: 'no-tax' },
-    { id: 'line-3', description: 'Support', rate: '25', quantity: '4', taxTypeId: 'other-gst' }
+    { id: 'line-1', description: 'Build app', rate: '100', quantity: '2', taxTypeIds: ['gst', 'levy'] },
+    { id: 'line-2', description: 'Hosting', rate: '50', quantity: '1', taxTypeIds: [] },
+    { id: 'line-3', description: 'Support', rate: '25', quantity: '4', taxTypeIds: ['levy'] }
   ],
   notes: '',
   paymentInstructions: ''
 }
 
 describe('calculateInvoice', () => {
-  it('calculates line totals and aggregates tax by selected tax id', () => {
+  it('calculates line totals and aggregates tax by selected tax ids', () => {
     const totals = calculateInvoice(draft)
 
     expect(totals.subtotal).toBe(350)
-    expect(totals.totalTax).toBe(30)
-    expect(totals.total).toBe(380)
+    expect(totals.totalTax).toBe(35)
+    expect(totals.total).toBe(385)
+    expect(totals.lines[0].taxes).toEqual([
+      { id: 'gst', name: 'GST', rate: 0.1, taxAmount: 20 },
+      { id: 'levy', name: 'Service Levy', rate: 0.05, taxAmount: 10 }
+    ])
     expect(totals.taxTotals).toEqual([
-      { id: 'gst', name: 'GST', amount: 20 },
-      { id: 'other-gst', name: 'Other GST', amount: 10 }
+      { id: 'gst', name: 'GST', rate: 0.1, amount: 20 },
+      { id: 'levy', name: 'Service Levy', rate: 0.05, amount: 15 }
     ])
   })
 
-  it('falls back to no tax for removed tax types', () => {
+  it('ignores removed tax types', () => {
     const totals = calculateInvoice({
       ...draft,
-      lineItems: [{ id: 'line-1', description: 'Mystery', rate: '99', quantity: '1', taxTypeId: 'gone' }]
+      lineItems: [{ id: 'line-1', description: 'Mystery', rate: '99', quantity: '1', taxTypeIds: ['gone'] }]
     })
 
     expect(totals.totalTax).toBe(0)
     expect(totals.total).toBe(99)
-    expect(totals.lines[0].taxName).toBe('No Tax')
+    expect(totals.lines[0].taxes).toEqual([])
   })
 })
 

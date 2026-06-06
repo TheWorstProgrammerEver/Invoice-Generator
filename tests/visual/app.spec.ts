@@ -6,11 +6,19 @@ test('invoice generator renders and updates the preview', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Invoice Generator' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'INV-001' })).toBeVisible()
 
+  const taxTypes = page.locator('section').filter({
+    has: page.getByRole('heading', { name: 'Tax Types' })
+  })
+  await taxTypes.getByRole('button', { name: 'Add Tax Type' }).click()
+  await taxTypes.getByLabel('Name').last().fill('Service levy')
+  await taxTypes.getByLabel('Rate').last().fill('0.05')
+
   const firstItem = page.locator('article').filter({ hasText: 'Item 1' })
   await firstItem.getByLabel('Description').fill('Design system audit\nInvoice preview polish')
   await firstItem.getByLabel('Rate').fill('120')
   await firstItem.getByLabel('Qty').fill('2')
-  await firstItem.getByLabel('Tax').selectOption('tax-gst')
+  await firstItem.getByRole('checkbox', { name: 'GST 10%' }).check()
+  await firstItem.getByRole('checkbox', { name: 'Service levy 5%' }).check()
 
   const preview = page.locator('section').filter({
     has: page.getByRole('heading', { name: 'INV-001' })
@@ -18,7 +26,9 @@ test('invoice generator renders and updates the preview', async ({ page }) => {
 
   await expect(preview.getByText('Design system audit')).toBeVisible()
   await expect(preview.getByText('Invoice preview polish')).toBeVisible()
-  await expect(preview.getByText('AUD 264.00').first()).toBeVisible()
+  await expect(preview.getByRole('rowheader', { name: 'GST', exact: true })).toBeVisible()
+  await expect(preview.getByRole('rowheader', { name: 'Service levy', exact: true })).toBeVisible()
+  await expect(preview.getByText('AUD 276.00').first()).toBeVisible()
 })
 
 test('invoice generator follows system dark mode', async ({ page }) => {

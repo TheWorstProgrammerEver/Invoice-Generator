@@ -34,7 +34,7 @@ export const createBlankLineItem = (): LineItem => ({
   description: '',
   rate: '',
   quantity: '1',
-  taxTypeId: noTaxId
+  taxTypeIds: []
 })
 
 export const createBlankTaxType = (): TaxType => ({

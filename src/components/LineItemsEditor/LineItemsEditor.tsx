@@ -1,3 +1,5 @@
+import { formatTaxRate } from '../../domain/invoice'
+import { noTaxId } from '../../state/invoiceDraftDefaults'
 import type { LineItem, TaxType } from '../../types'
 import styles from './LineItemsEditor.module.scss'
 
@@ -7,6 +9,16 @@ type LineItemsEditorProps = {
   addLineItem: () => void
   updateLineItem: (id: string, changes: Partial<LineItem>) => void
   removeLineItem: (id: string) => void
+}
+
+const getNextTaxTypeIds = (lineItem: LineItem, taxTypeId: string, checked: boolean) => {
+  const selectedTaxTypeIds = lineItem.taxTypeIds ?? []
+
+  if (checked) {
+    return [...new Set([...selectedTaxTypeIds, taxTypeId])]
+  }
+
+  return selectedTaxTypeIds.filter((selectedTaxTypeId) => selectedTaxTypeId !== taxTypeId)
 }
 
 export const LineItemsEditor = ({
@@ -66,19 +78,26 @@ export const LineItemsEditor = ({
               />
             </label>
 
-            <label>
-              Tax
-              <select
-                value={lineItem.taxTypeId}
-                onChange={(event) => updateLineItem(lineItem.id, { taxTypeId: event.target.value })}
-              >
-                {taxTypes.map((taxType) => (
-                  <option value={taxType.id} key={taxType.id}>
-                    {taxType.name || 'Untitled tax'}
-                  </option>
+            <fieldset className={styles.taxSet}>
+              <legend>Taxes</legend>
+              {taxTypes
+                .filter((taxType) => taxType.id !== noTaxId)
+                .map((taxType) => (
+                  <label className={styles.checkbox} key={taxType.id}>
+                    <input
+                      type="checkbox"
+                      checked={(lineItem.taxTypeIds ?? []).includes(taxType.id)}
+                      onChange={(event) =>
+                        updateLineItem(lineItem.id, {
+                          taxTypeIds: getNextTaxTypeIds(lineItem, taxType.id, event.target.checked)
+                        })
+                      }
+                    />
+                    <span>{taxType.name || 'Untitled tax'}</span>
+                    <small>{formatTaxRate(taxType.rate)}</small>
+                  </label>
                 ))}
-              </select>
-            </label>
+            </fieldset>
           </div>
         </article>
       ))}

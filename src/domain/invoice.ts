@@ -1,10 +1,4 @@
-import type { InvoiceDraft, InvoiceTotals, TaxType } from '../types'
-
-const fallbackTax: TaxType = {
-  id: 'tax-no',
-  name: 'No Tax',
-  rate: 0
-}
+import type { InvoiceDraft, InvoiceTotals } from '../types'
 
 export const toMoneyNumber = (value: string | number) => {
   const amount = typeof value === 'number' ? value : Number(value.trim())
@@ -14,24 +8,41 @@ export const toMoneyNumber = (value: string | number) => {
 
 export const calculateInvoice = (draft: InvoiceDraft): InvoiceTotals => {
   const taxTypesById = new Map(draft.taxTypes.map((taxType) => [taxType.id, taxType]))
-  const taxTotalsById = new Map<string, { name: string; amount: number }>()
+  const taxTotalsById = new Map<string, { name: string; rate: number; amount: number }>()
 
   const lines = draft.lineItems.map((lineItem) => {
-    const taxType = taxTypesById.get(lineItem.taxTypeId) ?? fallbackTax
     const amount = toMoneyNumber(lineItem.rate) * toMoneyNumber(lineItem.quantity)
-    const taxAmount = amount * toMoneyNumber(taxType.rate)
+    const taxes = (lineItem.taxTypeIds ?? []).flatMap((taxTypeId) => {
+      const taxType = taxTypesById.get(taxTypeId)
 
-    if (taxAmount !== 0) {
-      const current = taxTotalsById.get(taxType.id) ?? { name: taxType.name, amount: 0 }
+      if (!taxType) {
+        return []
+      }
+
+      const rate = toMoneyNumber(taxType.rate)
+      const taxAmount = amount * rate
+      const current = taxTotalsById.get(taxType.id) ?? {
+        name: taxType.name,
+        rate,
+        amount: 0
+      }
       taxTotalsById.set(taxType.id, { ...current, amount: current.amount + taxAmount })
-    }
+
+      return [{
+        id: taxType.id,
+        name: taxType.name || 'Untitled tax',
+        rate,
+        taxAmount
+      }]
+    })
+    const totalTax = taxes.reduce((sum, tax) => sum + tax.taxAmount, 0)
 
     return {
       ...lineItem,
       amount,
-      taxAmount,
-      total: amount + taxAmount,
-      taxName: taxType.name || 'Untitled tax'
+      taxes,
+      totalTax,
+      total: amount + totalTax
     }
   })
 
@@ -39,6 +50,7 @@ export const calculateInvoice = (draft: InvoiceDraft): InvoiceTotals => {
   const taxTotals = [...taxTotalsById.entries()].map(([id, tax]) => ({
     id,
     name: tax.name || 'Untitled tax',
+    rate: tax.rate,
     amount: tax.amount
   }))
   const totalTax = taxTotals.reduce((sum, tax) => sum + tax.amount, 0)
@@ -60,4 +72,12 @@ export const formatMoney = (amount: number, currency: string, locale = 'en-AU') 
   })
 
   return `${currencyCode} ${formattedAmount}`
+}
+
+export const formatTaxRate = (rate: number, locale = 'en-AU') => {
+  const formattedRate = (rate * 100).toLocaleString(locale, {
+    maximumFractionDigits: 4
+  })
+
+  return `${formattedRate}%`
 }

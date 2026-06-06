@@ -10,7 +10,7 @@ export type LineItem = {
   description: string
   rate: string
   quantity: string
-  taxTypeId: string
+  taxTypeIds: string[]
 }
 
 export type InvoiceDraft = {
@@ -26,16 +26,24 @@ export type InvoiceDraft = {
   paymentInstructions: string
 }
 
+export type InvoiceTaxAmount = {
+  id: string
+  name: string
+  rate: number
+  taxAmount: number
+}
+
 export type InvoiceLineTotal = LineItem & {
   amount: number
-  taxAmount: number
+  taxes: InvoiceTaxAmount[]
+  totalTax: number
   total: number
-  taxName: string
 }
 
 export type TaxTotal = {
   id: string
   name: string
+  rate: number
   amount: number
 }
 

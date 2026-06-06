@@ -29,7 +29,9 @@
     text-transform: uppercase;
   }
 
-  tbody td:not(:first-child),
+  tbody td:nth-child(3),
+  tbody td:nth-child(4),
+  tbody td:nth-child(5),
   tfoot td {
     text-align: right;
     white-space: nowrap;
@@ -111,9 +113,37 @@
   overflow-x: auto;
 }
 
-.description {
+.itemNumber {
+  width: 3rem;
+  color: var(--color-paper-muted);
+  font-weight: 900;
+}
+
+.description,
+.taxName {
   min-width: 10rem;
   white-space: pre-wrap;
+}
+
+.lineRow th,
+.lineRow td {
+  border-bottom-color: var(--color-paper-rule);
+}
+
+.taxRow th,
+.taxRow td {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+  color: var(--color-paper-muted);
+  font-size: 0.78rem;
+}
+
+.taxName {
+  font-weight: 800;
+}
+
+.taxPrefix {
+  margin-right: 0.45rem;
 }
 
 .totalRow th,

@@ -3,8 +3,7 @@ import type { InvoiceDraft, LineItem, TaxType } from '../types'
 import {
   createBlankLineItem,
   createBlankTaxType,
-  createDefaultInvoiceDraft,
-  noTaxId
+  createDefaultInvoiceDraft
 } from './invoiceDraftDefaults'
 
 export const useInvoiceDraft = () => {
@@ -38,7 +37,9 @@ export const useInvoiceDraft = () => {
       ...current,
       taxTypes: current.taxTypes.filter((taxType) => taxType.id !== id || taxType.locked),
       lineItems: current.lineItems.map((lineItem) =>
-        lineItem.taxTypeId === id ? { ...lineItem, taxTypeId: noTaxId } : lineItem
+        (lineItem.taxTypeIds ?? []).includes(id)
+          ? { ...lineItem, taxTypeIds: lineItem.taxTypeIds.filter((taxTypeId) => taxTypeId !== id) }
+          : lineItem
       )
     }))
   }, [])
