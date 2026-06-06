@@ -1,0 +1,165 @@
+.preview {
+  display: grid;
+  gap: 1.35rem;
+  border: 1px solid var(--color-strong-border);
+  border-radius: 8px;
+  padding: clamp(1rem, 2.6vw, 2rem);
+  background: var(--color-paper);
+  color: var(--color-paper-text);
+  box-shadow: 0 18px 50px var(--shadow-paper);
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+  }
+
+  th,
+  td {
+    border-bottom: 1px solid var(--color-paper-border);
+    padding: 0.55rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  thead th,
+  tfoot th {
+    color: var(--color-paper-muted);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+  }
+
+  tbody td:not(:first-child),
+  tfoot td {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  tfoot th {
+    text-align: right;
+  }
+}
+
+.header,
+.parties {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+}
+
+.header {
+  align-items: start;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--color-paper-rule);
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    font-size: clamp(1.45rem, 3vw, 2rem);
+  }
+}
+
+.kicker {
+  color: var(--color-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.dates {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  min-width: 10rem;
+
+  div {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    gap: 0.5rem;
+  }
+
+  dt {
+    color: var(--color-paper-muted);
+    font-weight: 800;
+  }
+
+  dd {
+    margin: 0;
+    text-align: right;
+  }
+}
+
+.parties {
+  align-items: start;
+
+  address,
+  strong {
+    white-space: pre-wrap;
+  }
+
+  address {
+    margin: 0.35rem 0 0;
+    font-style: normal;
+    line-height: 1.45;
+  }
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.description {
+  min-width: 10rem;
+  white-space: pre-wrap;
+}
+
+.totalRow th,
+.totalRow td {
+  border-bottom: 0;
+  color: var(--color-paper-text);
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.noteBlock {
+  display: grid;
+  gap: 0.3rem;
+
+  h3,
+  p {
+    margin: 0;
+  }
+
+  h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+  }
+
+  p {
+    white-space: pre-wrap;
+    line-height: 1.45;
+  }
+}
+
+@media (max-width: 640px) {
+  .header,
+  .parties {
+    grid-template-columns: 1fr;
+  }
+
+  .dates dd {
+    text-align: left;
+  }
+}
+
+@media print {
+  .preview {
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+}

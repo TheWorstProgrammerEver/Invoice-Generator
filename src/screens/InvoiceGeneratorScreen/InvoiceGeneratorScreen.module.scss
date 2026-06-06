@@ -1,0 +1,88 @@
+.screen {
+  min-height: 100svh;
+  padding: clamp(1rem, 3vw, 2rem);
+  background: var(--color-page);
+  color: var(--color-text);
+}
+
+.header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 82rem;
+  margin: 0 auto 1.25rem;
+
+  h1,
+  p {
+    margin: 0;
+  }
+
+  h1 {
+    font-size: clamp(1.65rem, 3vw, 2.35rem);
+    line-height: 1;
+  }
+
+  p {
+    margin-bottom: 0.35rem;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+}
+
+.printButton {
+  min-height: 2.5rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 6px;
+  padding: 0 1rem;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-weight: 800;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(21rem, 0.78fr) minmax(34rem, 1.22fr);
+  gap: clamp(1rem, 2vw, 1.5rem);
+  max-width: 86rem;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.editor {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (max-width: 940px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    display: grid;
+    align-items: start;
+  }
+
+  .printButton {
+    width: 100%;
+  }
+}
+
+@media print {
+  .screen {
+    min-height: auto;
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .workspace {
+    display: block;
+    max-width: none;
+    margin: 0;
+  }
+}
