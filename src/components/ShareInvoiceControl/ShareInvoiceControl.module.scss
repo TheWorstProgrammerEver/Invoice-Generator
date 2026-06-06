@@ -1,0 +1,89 @@
+.control {
+  display: grid;
+  justify-items: end;
+
+  button {
+    min-height: 2.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 0 1rem;
+    background: var(--color-field);
+    color: var(--color-text);
+    font-weight: 800;
+  }
+}
+
+.dialog {
+  width: min(34rem, calc(100vw - 2rem));
+  border: 1px solid var(--color-strong-border);
+  border-radius: 8px;
+  padding: 0;
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 22px 60px var(--shadow-paper);
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  header,
+  footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  header {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  footer {
+    justify-content: end;
+    border-top: 1px solid var(--color-border);
+  }
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  p {
+    padding: 1rem 1rem 0;
+    color: var(--color-muted);
+    font-weight: 800;
+  }
+
+  button {
+    min-height: 2.35rem;
+  }
+}
+
+.urlField {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1rem;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+
+  input {
+    min-width: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 0.6rem;
+    background: var(--color-field);
+    color: var(--color-text);
+  }
+}
+
+@media (max-width: 640px) {
+  .control {
+    justify-items: stretch;
+  }
+}

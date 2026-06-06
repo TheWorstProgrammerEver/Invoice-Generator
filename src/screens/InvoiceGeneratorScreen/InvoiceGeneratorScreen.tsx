@@ -1,6 +1,7 @@
 import { InvoiceDetailsForm } from '../../components/InvoiceDetailsForm/InvoiceDetailsForm'
 import { InvoicePreview } from '../../components/InvoicePreview/InvoicePreview'
 import { LineItemsEditor } from '../../components/LineItemsEditor/LineItemsEditor'
+import { ShareInvoiceControl } from '../../components/ShareInvoiceControl/ShareInvoiceControl'
 import { TaxTypesEditor } from '../../components/TaxTypesEditor/TaxTypesEditor'
 import { useInvoiceGeneratorViewModel } from './useInvoiceGeneratorViewModel'
 import styles from './InvoiceGeneratorScreen.module.scss'
@@ -15,9 +16,18 @@ export const InvoiceGeneratorScreen = () => {
           <p>{viewModel.environment}</p>
           <h1>{viewModel.appName}</h1>
         </div>
-        <button className={styles.printButton} type="button" onClick={viewModel.printInvoice}>
-          Export to PDF
-        </button>
+        <div className={styles.actions}>
+          <ShareInvoiceControl
+            closeShareDialog={viewModel.closeShareDialog}
+            isShareDialogOpen={viewModel.isShareDialogOpen}
+            shareInvoice={viewModel.shareInvoice}
+            shareStatus={viewModel.shareStatus}
+            shareUrl={viewModel.shareUrl}
+          />
+          <button className={styles.printButton} type="button" onClick={viewModel.printInvoice}>
+            Export PDF
+          </button>
+        </div>
       </header>
 
       <div className={styles.workspace}>

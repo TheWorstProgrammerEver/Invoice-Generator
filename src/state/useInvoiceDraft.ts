@@ -6,8 +6,8 @@ import {
   createDefaultInvoiceDraft
 } from './invoiceDraftDefaults'
 
-export const useInvoiceDraft = () => {
-  const [draft, setDraft] = useState(createDefaultInvoiceDraft)
+export const useInvoiceDraft = (initialDraft?: InvoiceDraft) => {
+  const [draft, setDraft] = useState(() => initialDraft ?? createDefaultInvoiceDraft())
 
   const updateField = useCallback(
     <Key extends keyof InvoiceDraft>(field: Key, value: InvoiceDraft[Key]) => {

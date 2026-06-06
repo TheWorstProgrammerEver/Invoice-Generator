@@ -6,11 +6,11 @@
 }
 
 .header {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(21rem, 0.78fr) minmax(34rem, 1.22fr);
   align-items: end;
-  justify-content: space-between;
   gap: 1rem;
-  max-width: 82rem;
+  max-width: 86rem;
   margin: 0 auto 1.25rem;
 
   h1,
@@ -42,6 +42,13 @@
   font-weight: 800;
 }
 
+.actions {
+  display: flex;
+  align-items: start;
+  justify-self: end;
+  gap: 0.75rem;
+}
+
 .workspace {
   display: grid;
   grid-template-columns: minmax(21rem, 0.78fr) minmax(34rem, 1.22fr);
@@ -65,10 +72,17 @@
 @media (max-width: 640px) {
   .header {
     display: grid;
+    grid-template-columns: 1fr;
     align-items: start;
   }
 
   .printButton {
+    width: 100%;
+  }
+
+  .actions {
+    display: grid;
+    justify-self: stretch;
     width: 100%;
   }
 }
