@@ -103,3 +103,60 @@ test('invoice generator loads from the URL and shares on demand', async ({ page 
 
   expect(draft.invoiceNumber).toBe('INV-LINK-043')
 })
+
+test('compact layouts avoid overlap and horizontal overflow', async ({ page }) => {
+  await page.setViewportSize({ width: 821, height: 1180 })
+  await page.goto('/')
+
+  await expect(page.getByRole('heading', { name: 'Invoice Generator' })).toBeVisible()
+
+  const mediumLayout = await page.evaluate(() => {
+    const details = document.querySelector('[aria-labelledby="invoice-details-title"]')
+    const preview = document.querySelector('[aria-labelledby="preview-title"]')
+    const detailsRect = details?.getBoundingClientRect()
+    const previewRect = preview?.getBoundingClientRect()
+
+    return {
+      hasHorizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
+      previewBelowDetails: Boolean(detailsRect && previewRect && previewRect.top > detailsRect.bottom)
+    }
+  })
+
+  expect(mediumLayout).toEqual({
+    hasHorizontalOverflow: false,
+    previewBelowDetails: true
+  })
+
+  await page.setViewportSize({ width: 800, height: 1180 })
+
+  const narrowLayout = await page.evaluate(() => {
+    const actions = document.querySelector('[class*="actions"]')
+    const titleBlock = document.querySelector('[class*="titleBlock"]')
+    const workspace = document.querySelector('[class*="workspace"]')
+    const actionsRect = actions?.getBoundingClientRect()
+    const titleRect = titleBlock?.getBoundingClientRect()
+    const workspaceRect = workspace?.getBoundingClientRect()
+
+    return {
+      actionsInsideWorkspace: Boolean(
+        actionsRect &&
+        workspaceRect &&
+        actionsRect.left >= workspaceRect.left &&
+        actionsRect.right <= workspaceRect.right
+      ),
+      actionsBesideTitle: Boolean(
+        actionsRect &&
+        titleRect &&
+        actionsRect.top < titleRect.bottom &&
+        actionsRect.bottom > titleRect.top
+      ),
+      hasHorizontalOverflow: document.documentElement.scrollWidth > window.innerWidth
+    }
+  })
+
+  expect(narrowLayout).toEqual({
+    actionsBesideTitle: true,
+    actionsInsideWorkspace: true,
+    hasHorizontalOverflow: false
+  })
+})

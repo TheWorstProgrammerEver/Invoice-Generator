@@ -6,10 +6,11 @@
 }
 
 .header {
-  display: grid;
-  grid-template-columns: minmax(21rem, 0.78fr) minmax(34rem, 1.22fr);
-  align-items: end;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 1rem;
+  width: 100%;
   max-width: 86rem;
   margin: 0 auto 1.25rem;
 
@@ -32,6 +33,10 @@
   }
 }
 
+.titleBlock {
+  min-width: 0;
+}
+
 .printButton {
   min-height: 2.5rem;
   border: 1px solid var(--color-accent);
@@ -44,9 +49,10 @@
 
 .actions {
   display: flex;
-  align-items: start;
-  justify-self: end;
+  align-items: center;
   gap: 0.75rem;
+  flex-shrink: 0;
+  min-width: 0;
 }
 
 .workspace {
@@ -63,7 +69,7 @@
   gap: 1rem;
 }
 
-@media (max-width: 940px) {
+@media (max-width: 1120px) {
   .workspace {
     grid-template-columns: 1fr;
   }
@@ -71,18 +77,16 @@
 
 @media (max-width: 640px) {
   .header {
-    display: grid;
-    grid-template-columns: 1fr;
-    align-items: start;
-  }
-
-  .printButton {
-    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .actions {
     display: grid;
-    justify-self: stretch;
+    width: 100%;
+  }
+
+  .printButton {
     width: 100%;
   }
 }

@@ -12,7 +12,7 @@ export const InvoiceGeneratorScreen = () => {
   return (
     <main className={styles.screen}>
       <header className={styles.header} data-print-hidden="true">
-        <div>
+        <div className={styles.titleBlock}>
           <p>{viewModel.environment}</p>
           <h1>{viewModel.appName}</h1>
         </div>
