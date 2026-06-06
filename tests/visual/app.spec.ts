@@ -160,3 +160,53 @@ test('compact layouts avoid overlap and horizontal overflow', async ({ page }) =
     hasHorizontalOverflow: false
   })
 })
+
+test('invoice preview stays visible on wide layouts only', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 })
+  await page.goto('/')
+
+  const lineItems = page.locator('section').filter({
+    has: page.getByRole('heading', { name: 'Line Items' })
+  })
+
+  for (let count = 0; count < 10; count += 1) {
+    await lineItems.getByRole('button', { name: 'Add Item' }).click()
+  }
+
+  const wideLayout = await page.evaluate(() => {
+    window.scrollTo(0, 0)
+
+    const previewPane = document.querySelector('[class*="previewPane"]')
+    const before = previewPane?.getBoundingClientRect().top ?? 0
+
+    window.scrollTo(0, 900)
+
+    const after = previewPane?.getBoundingClientRect().top ?? 0
+
+    return {
+      topBeforeScroll: Math.round(before),
+      topAfterScroll: Math.round(after),
+      position: previewPane ? getComputedStyle(previewPane).position : ''
+    }
+  })
+
+  expect(wideLayout.position).toBe('sticky')
+  expect(wideLayout.topBeforeScroll).toBeGreaterThan(50)
+  expect(wideLayout.topAfterScroll).toBe(16)
+
+  await page.setViewportSize({ width: 900, height: 720 })
+
+  const compactLayout = await page.evaluate(() => {
+    const previewPane = document.querySelector('[class*="previewPane"]')
+
+    return {
+      position: previewPane ? getComputedStyle(previewPane).position : '',
+      maxHeight: previewPane ? getComputedStyle(previewPane).maxHeight : ''
+    }
+  })
+
+  expect(compactLayout).toEqual({
+    position: 'static',
+    maxHeight: 'none'
+  })
+})

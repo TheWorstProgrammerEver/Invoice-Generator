@@ -52,7 +52,9 @@ export const InvoiceGeneratorScreen = () => {
           />
         </form>
 
-        <InvoicePreview draft={viewModel.draft} totals={viewModel.totals} />
+        <aside className={styles.previewPane}>
+          <InvoicePreview draft={viewModel.draft} totals={viewModel.totals} />
+        </aside>
       </div>
     </main>
   )

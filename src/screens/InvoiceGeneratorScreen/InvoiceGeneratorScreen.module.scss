@@ -69,9 +69,22 @@
   gap: 1rem;
 }
 
+.previewPane {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100svh - 2rem);
+  overflow: auto;
+}
+
 @media (max-width: 1120px) {
   .workspace {
     grid-template-columns: 1fr;
+  }
+
+  .previewPane {
+    position: static;
+    max-height: none;
+    overflow: visible;
   }
 }
 
@@ -102,5 +115,11 @@
     display: block;
     max-width: none;
     margin: 0;
+  }
+
+  .previewPane {
+    position: static;
+    max-height: none;
+    overflow: visible;
   }
 }
