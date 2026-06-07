@@ -64,6 +64,15 @@
   align-items: start;
 }
 
+.documentScreen {
+  padding-block: clamp(1rem, 4vw, 3rem);
+}
+
+.documentWorkspace {
+  display: block;
+  max-width: 58rem;
+}
+
 .editor {
   display: grid;
   gap: 1rem;
@@ -74,6 +83,12 @@
   top: 1rem;
   max-height: calc(100svh - 2rem);
   overflow: auto;
+}
+
+.documentWorkspace .previewPane {
+  position: static;
+  max-height: none;
+  overflow: visible;
 }
 
 @media (max-width: 1120px) {

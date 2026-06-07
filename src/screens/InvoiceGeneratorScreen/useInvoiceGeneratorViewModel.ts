@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
+  invoiceModeParamName,
+  parseInvoiceLaunchMode
+} from '../../data/invoiceLaunchMode'
+import {
   decodeInvoiceDraftFromUrl,
   encodeInvoiceDraftForUrl,
   invoiceParamName
 } from '../../data/invoiceUrlCodec'
 import { calculateInvoice } from '../../domain/invoice'
+import { useOneTimeEffect } from '../../hooks/useOneTimeEffect'
 import { createDefaultInvoiceDraft } from '../../state/invoiceDraftDefaults'
 import { useInvoiceDraft } from '../../state/useInvoiceDraft'
 
@@ -20,6 +25,8 @@ export const useInvoiceGeneratorViewModel = () => {
   const [shareStatus, setShareStatus] = useState<'copied' | 'idle' | 'ready'>('idle')
   const draftState = useInvoiceDraft(initialDraft.current)
   const totals = useMemo(() => calculateInvoice(draftState.draft), [draftState.draft])
+  const launchMode = parseInvoiceLaunchMode(searchParams.get(invoiceModeParamName))
+  const isDocumentMode = launchMode !== 'edit'
 
   useEffect(() => {
     if (!shouldClearUrlInvoice.current) {
@@ -31,6 +38,10 @@ export const useInvoiceGeneratorViewModel = () => {
     setSearchParams(nextParams, { replace: true })
     shouldClearUrlInvoice.current = false
   }, [searchParams, setSearchParams])
+
+  const printLaunchModeInvoice = useCallback(() => window.print(), [])
+
+  useOneTimeEffect(printLaunchModeInvoice, launchMode === 'print')
 
   const printInvoice = () => {
     window.print()
@@ -61,7 +72,9 @@ export const useInvoiceGeneratorViewModel = () => {
     appName: window.config?.appName ?? 'Invoice Generator',
     closeShareDialog,
     environment: window.config?.environment ?? 'local',
+    isDocumentMode,
     isShareDialogOpen,
+    launchMode,
     printInvoice,
     shareInvoice,
     shareStatus,

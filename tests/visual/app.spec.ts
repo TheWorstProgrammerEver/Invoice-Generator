@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test'
 import {
+  invoiceModeParamName
+} from '../../src/data/invoiceLaunchMode'
+import {
   decodeInvoiceDraftFromUrl,
   encodeInvoiceDraftForUrl,
   invoiceParamName
@@ -102,6 +105,46 @@ test('invoice generator loads from the URL and shares on demand', async ({ page 
   )
 
   expect(draft.invoiceNumber).toBe('INV-LINK-043')
+})
+
+test('invoice generator supports URL launch modes', async ({ page }) => {
+  await page.goto(`/?${invoiceModeParamName}=preview&${invoiceParamName}=${encodeInvoiceDraftForUrl(linkedDraft)}`)
+
+  await expect(page.getByRole('heading', { name: 'INV-LINK-042' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Invoice Generator' })).toHaveCount(0)
+  await expect(page.getByLabel('Invoice Number', { exact: true })).toHaveCount(0)
+  await expect.poll(() => new URL(page.url()).searchParams.get(invoiceModeParamName)).toBe('preview')
+  await expect.poll(() => new URL(page.url()).searchParams.has(invoiceParamName)).toBe(false)
+
+  const previewLayout = await page.evaluate(() => {
+    const workspace = document.querySelector('[class*="documentWorkspace"]')
+    const previewPane = document.querySelector('[class*="previewPane"]')
+
+    return {
+      mode: document.querySelector('main')?.getAttribute('data-launch-mode'),
+      workspaceDisplay: workspace ? getComputedStyle(workspace).display : '',
+      previewPosition: previewPane ? getComputedStyle(previewPane).position : ''
+    }
+  })
+
+  expect(previewLayout).toEqual({
+    mode: 'preview',
+    workspaceDisplay: 'block',
+    previewPosition: 'static'
+  })
+
+  await page.addInitScript(() => {
+    window.print = () => {
+      window.sessionStorage.setItem('printCalls', String(Number(
+        window.sessionStorage.getItem('printCalls') ?? '0'
+      ) + 1))
+    }
+  })
+  await page.goto(`/?${invoiceModeParamName}=print&${invoiceParamName}=${encodeInvoiceDraftForUrl(linkedDraft)}`)
+
+  await expect(page.getByRole('heading', { name: 'INV-LINK-042' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Invoice Generator' })).toHaveCount(0)
+  await expect.poll(() => page.evaluate(() => window.sessionStorage.getItem('printCalls'))).toBe('1')
 })
 
 test('compact layouts avoid overlap and horizontal overflow', async ({ page }) => {
