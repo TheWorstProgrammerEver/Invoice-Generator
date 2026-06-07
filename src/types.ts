@@ -1,30 +1,11 @@
-export type TaxType = {
-  id: string
-  name: string
-  rate: number
-  locked?: boolean
-}
+import type { LineItem } from './types/invoiceDraft'
 
-export type LineItem = {
-  id: string
-  description: string
-  rate: string
-  quantity: string
-  taxTypeIds: string[]
-}
-
-export type InvoiceDraft = {
-  sellerDetails: string
-  invoiceNumber: string
-  currency: string
-  dateIssued: string
-  dateDue: string
-  customerDetails: string
-  taxTypes: TaxType[]
-  lineItems: LineItem[]
-  notes: string
-  paymentInstructions: string
-}
+export type {
+  InvoiceDraft,
+  InvoiceUrlPayload,
+  LineItem,
+  TaxType
+} from './types/invoiceDraft'
 
 export type InvoiceTaxAmount = {
   id: string

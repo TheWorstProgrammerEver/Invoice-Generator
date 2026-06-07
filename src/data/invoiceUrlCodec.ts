@@ -1,12 +1,7 @@
-import type { InvoiceDraft } from '../types'
+import type { InvoiceDraft, InvoiceUrlPayload } from '../types'
 import { normalizeInvoiceDraft } from './invoiceDraftNormalizer'
 
 export const invoiceParamName = 'invoice'
-
-type InvoiceUrlPayload = {
-  draft: unknown
-  v: 1
-}
 
 const textEncoder = new TextEncoder()
 const textDecoder = new TextDecoder()
@@ -44,7 +39,7 @@ const parsePayload = (encodedDraft: string) => {
 }
 
 export const encodeInvoiceDraftForUrl = (draft: InvoiceDraft) =>
-  encodeBase64Url(JSON.stringify({ v: 1, draft }))
+  encodeBase64Url(JSON.stringify({ v: 1, draft } satisfies InvoiceUrlPayload))
 
 export const decodeInvoiceDraftFromUrl = (
   encodedDraft: null | string,

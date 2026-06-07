@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npm run generate:contract && tsc -b && vite build",
+    "generate:contract": "node scripts/generate-invoice-contract.mjs",
     "preview": "vite preview",
     "lint": "tsc -b",
     "test": "vitest run",
