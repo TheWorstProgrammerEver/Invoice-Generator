@@ -1,5 +1,4 @@
 import type { InvoiceDraft, InvoiceUrlPayload } from '../types'
-import { normalizeInvoiceDraft } from './invoiceDraftNormalizer'
 
 export const invoiceParamName = 'invoice'
 
@@ -41,20 +40,27 @@ const parsePayload = (encodedDraft: string) => {
 export const encodeInvoiceDraftForUrl = (draft: InvoiceDraft) =>
   encodeBase64Url(JSON.stringify({ v: 1, draft } satisfies InvoiceUrlPayload))
 
+export type InvoiceDraftUrlDecodeResult =
+  | { status: 'empty' }
+  | { status: 'invalid' }
+  | { draft: Partial<InvoiceDraft>, status: 'loaded' }
+
 export const decodeInvoiceDraftFromUrl = (
-  encodedDraft: null | string,
-  fallbackDraft: InvoiceDraft
-): InvoiceDraft => {
+  encodedDraft: null | string
+): InvoiceDraftUrlDecodeResult => {
   if (!encodedDraft) {
-    return fallbackDraft
+    return { status: 'empty' }
   }
 
   const payload = parsePayload(encodedDraft) as Partial<InvoiceUrlPayload> | undefined
   const candidate = (payload?.v === 1 ? payload.draft : payload) as Partial<InvoiceDraft> | undefined
 
   if (!candidate || typeof candidate !== 'object') {
-    return fallbackDraft
+    return { status: 'invalid' }
   }
 
-  return normalizeInvoiceDraft(candidate, fallbackDraft)
+  return {
+    draft: candidate,
+    status: 'loaded'
+  }
 }

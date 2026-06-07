@@ -99,12 +99,10 @@ test('invoice generator loads from the URL and shares on demand', async ({ page 
   await page.getByRole('button', { name: 'Share Draft' }).click()
 
   const shareUrl = await page.getByLabel('Draft URL').inputValue()
-  const draft = decodeInvoiceDraftFromUrl(
-    new URL(shareUrl).searchParams.get(invoiceParamName),
-    linkedDraft
-  )
+  const draftResult = decodeInvoiceDraftFromUrl(new URL(shareUrl).searchParams.get(invoiceParamName))
 
-  expect(draft.invoiceNumber).toBe('INV-LINK-043')
+  expect(draftResult.status).toBe('loaded')
+  expect(draftResult.status === 'loaded' ? draftResult.draft.invoiceNumber : '').toBe('INV-LINK-043')
 })
 
 test('invoice generator supports URL launch modes', async ({ page }) => {
@@ -145,6 +143,25 @@ test('invoice generator supports URL launch modes', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'INV-LINK-042' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Invoice Generator' })).toHaveCount(0)
   await expect.poll(() => page.evaluate(() => window.sessionStorage.getItem('printCalls'))).toBe('1')
+})
+
+test('invoice generator reports invalid invoice URLs', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.print = () => {
+      window.sessionStorage.setItem('printCalls', String(Number(
+        window.sessionStorage.getItem('printCalls') ?? '0'
+      ) + 1))
+    }
+  })
+  await page.goto(`/?${invoiceModeParamName}=print&${invoiceParamName}=not-json-or-base64`)
+
+  await expect(page.getByRole('alert')).toHaveText(
+    'This invoice link could not be loaded. Showing a blank draft instead.'
+  )
+  await expect(page.getByRole('heading', { name: 'INV-001' })).toBeVisible()
+  await expect.poll(() => new URL(page.url()).searchParams.get(invoiceModeParamName)).toBe('print')
+  await expect.poll(() => new URL(page.url()).searchParams.has(invoiceParamName)).toBe(false)
+  await expect.poll(() => page.evaluate(() => window.sessionStorage.getItem('printCalls'))).toBeNull()
 })
 
 test('compact layouts avoid overlap and horizontal overflow', async ({ page }) => {

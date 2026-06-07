@@ -38,6 +38,12 @@ export const InvoiceGeneratorScreen = () => {
         </header>
       ) : null}
 
+      {viewModel.hasInvoiceUrlError ? (
+        <div className={styles.alert} role="alert">
+          This invoice link could not be loaded. Showing a blank draft instead.
+        </div>
+      ) : null}
+
       <div className={workspaceClassName}>
         {!viewModel.isDocumentMode ? (
           <form

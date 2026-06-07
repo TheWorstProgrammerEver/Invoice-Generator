@@ -75,16 +75,28 @@ describe('invoice URL codec', () => {
   })
 
   it('round-trips a complete invoice draft through the URL payload', () => {
-    expect(decodeInvoiceDraftFromUrl(encodeInvoiceDraftForUrl(draft), fallbackDraft)).toEqual(draft)
+    expect(decodeInvoiceDraftFromUrl(encodeInvoiceDraftForUrl(draft))).toEqual({
+      draft,
+      status: 'loaded'
+    })
   })
 
   it('accepts raw JSON payloads for programmatic callers', () => {
     const encodedDraft = JSON.stringify({ v: 1, draft })
 
-    expect(decodeInvoiceDraftFromUrl(encodedDraft, fallbackDraft)).toEqual(draft)
+    expect(decodeInvoiceDraftFromUrl(encodedDraft)).toEqual({
+      draft,
+      status: 'loaded'
+    })
   })
 
-  it('falls back safely when the payload is invalid', () => {
-    expect(decodeInvoiceDraftFromUrl('not-json-or-base64', fallbackDraft)).toEqual(fallbackDraft)
+  it('reports missing URL payloads', () => {
+    expect(decodeInvoiceDraftFromUrl(null)).toEqual({ status: 'empty' })
+  })
+
+  it('reports invalid URL payloads', () => {
+    expect(decodeInvoiceDraftFromUrl('not-json-or-base64')).toEqual({
+      status: 'invalid'
+    })
   })
 })

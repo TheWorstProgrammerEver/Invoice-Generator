@@ -9,6 +9,7 @@ import {
   encodeInvoiceDraftForUrl,
   invoiceParamName
 } from '../../data/invoiceUrlCodec'
+import { normalizeInvoiceDraft } from '../../data/invoiceDraftNormalizer'
 import { calculateInvoice } from '../../domain/invoice'
 import { useOneTimeEffect } from '../../hooks/useOneTimeEffect'
 import { createDefaultInvoiceDraft } from '../../state/invoiceDraftDefaults'
@@ -16,14 +17,19 @@ import { useInvoiceDraft } from '../../state/useInvoiceDraft'
 
 export const useInvoiceGeneratorViewModel = () => {
   const [searchParams, setSearchParams] = useSearchParams()
-  const initialDraft = useRef(
-    decodeInvoiceDraftFromUrl(searchParams.get(invoiceParamName), createDefaultInvoiceDraft())
+  const defaultDraft = useRef(createDefaultInvoiceDraft())
+  const initialDraftResult = useRef(
+    decodeInvoiceDraftFromUrl(searchParams.get(invoiceParamName))
   )
+  const hasInvoiceUrlError = initialDraftResult.current.status === 'invalid'
+  const initialDraft = initialDraftResult.current.status === 'loaded'
+    ? normalizeInvoiceDraft(initialDraftResult.current.draft, defaultDraft.current)
+    : defaultDraft.current
   const shouldClearUrlInvoice = useRef(searchParams.has(invoiceParamName))
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const [shareUrl, setShareUrl] = useState('')
   const [shareStatus, setShareStatus] = useState<'copied' | 'idle' | 'ready'>('idle')
-  const draftState = useInvoiceDraft(initialDraft.current)
+  const draftState = useInvoiceDraft(initialDraft)
   const totals = useMemo(() => calculateInvoice(draftState.draft), [draftState.draft])
   const launchMode = parseInvoiceLaunchMode(searchParams.get(invoiceModeParamName))
   const isDocumentMode = launchMode !== 'edit'
@@ -41,7 +47,7 @@ export const useInvoiceGeneratorViewModel = () => {
 
   const printLaunchModeInvoice = useCallback(() => window.print(), [])
 
-  useOneTimeEffect(printLaunchModeInvoice, launchMode === 'print')
+  useOneTimeEffect(printLaunchModeInvoice, launchMode === 'print' && !hasInvoiceUrlError)
 
   const printInvoice = () => {
     window.print()
@@ -72,6 +78,7 @@ export const useInvoiceGeneratorViewModel = () => {
     appName: window.config?.appName ?? 'Invoice Generator',
     closeShareDialog,
     environment: window.config?.environment ?? 'local',
+    hasInvoiceUrlError,
     isDocumentMode,
     isShareDialogOpen,
     launchMode,
