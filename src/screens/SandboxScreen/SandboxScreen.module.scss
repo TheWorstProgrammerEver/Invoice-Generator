@@ -1,0 +1,115 @@
+.screen {
+  min-height: 100svh;
+  padding: clamp(1rem, 3vw, 2rem);
+  background: var(--color-page);
+  color: var(--color-text);
+}
+
+.header {
+  max-width: 86rem;
+  margin: 0 auto 1.25rem;
+
+  h1,
+  p {
+    margin: 0;
+  }
+
+  h1 {
+    font-size: clamp(1.65rem, 3vw, 2.35rem);
+    line-height: 1;
+  }
+
+  p {
+    margin-bottom: 0.35rem;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(24rem, 0.85fr) minmax(34rem, 1.15fr);
+  gap: clamp(1rem, 2vw, 1.5rem);
+  max-width: 86rem;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.panel {
+  display: grid;
+  gap: 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1rem;
+  background: var(--color-surface);
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    font-size: 1.05rem;
+  }
+
+  label {
+    display: grid;
+    gap: 0.4rem;
+    color: var(--color-muted);
+    font-weight: 800;
+  }
+
+  input,
+  textarea {
+    min-width: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 0.7rem;
+    background: var(--color-field);
+    color: var(--color-text);
+  }
+}
+
+.jsonField textarea {
+  min-height: 23rem;
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.alert {
+  border: 1px solid var(--color-danger-border);
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: var(--color-danger);
+  font-weight: 800;
+}
+
+.status {
+  color: var(--color-muted);
+  font-weight: 800;
+}
+
+.previewPane {
+  position: sticky;
+  top: 1rem;
+  grid-row: span 2;
+  max-height: calc(100svh - 2rem);
+  overflow: auto;
+}
+
+@media (max-width: 1120px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .previewPane {
+    position: static;
+    grid-row: auto;
+    max-height: none;
+    overflow: visible;
+  }
+}

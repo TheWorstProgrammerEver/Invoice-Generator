@@ -164,6 +164,41 @@ test('invoice generator reports invalid invoice URLs', async ({ page }) => {
   await expect.poll(() => page.evaluate(() => window.sessionStorage.getItem('printCalls'))).toBeNull()
 })
 
+test('developer sandbox previews pasted invoice JSON', async ({ page }) => {
+  await page.goto('/sandbox')
+
+  await expect(page.getByRole('heading', { name: 'Invoice Payload Sandbox' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'INV-SANDBOX-001' })).toBeVisible()
+  await expect(page.getByRole('cell', { name: 'Linked invoice payload' })).toBeVisible()
+
+  const previewUrl = await page.getByLabel('Preview').inputValue()
+  const previewDraft = decodeInvoiceDraftFromUrl(new URL(previewUrl).searchParams.get(invoiceParamName))
+
+  expect(new URL(previewUrl).searchParams.get(invoiceModeParamName)).toBe('preview')
+  expect(previewDraft.status).toBe('loaded')
+  expect(previewDraft.status === 'loaded' ? previewDraft.draft.invoiceNumber : '').toBe('INV-SANDBOX-001')
+
+  await page.getByLabel('Invoice payload').fill(JSON.stringify({
+    invoiceNumber: 'INV-PASTED-007',
+    customerDetails: 'Pasted Customer',
+    lineItems: [{
+      id: 'line-pasted',
+      description: 'Pasted API work',
+      rate: '90',
+      quantity: '4',
+      taxTypeIds: ['tax-gst']
+    }]
+  }, null, 2))
+
+  await expect(page.getByRole('heading', { name: 'INV-PASTED-007' })).toBeVisible()
+  await expect(page.getByRole('cell', { name: 'Pasted API work' })).toBeVisible()
+  await expect(page.getByText('AUD 396.00').first()).toBeVisible()
+
+  await page.getByLabel('Invoice payload').fill('{ not json')
+  await expect(page.getByRole('alert')).toHaveText('JSON could not be parsed.')
+  await expect(page.getByRole('heading', { name: 'INV-001' })).toBeVisible()
+})
+
 test('compact layouts avoid overlap and horizontal overflow', async ({ page }) => {
   await page.setViewportSize({ width: 821, height: 1180 })
   await page.goto('/')
